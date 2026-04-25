@@ -1423,12 +1423,7 @@ local function Hide(notify: boolean?)
 	end
 
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 470, 0, 0)}):Play()
-	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 470, 0, 45)}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(Main.Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(Main.Topbar.CornerRepair, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(Main.Topbar.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
 	TweenService:Create(Topbar.UIStroke, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 	if dragBarCosmetic then
@@ -1709,6 +1704,66 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 	local Passthrough = false
 	Topbar.Title.Text = Settings.Name
+-- === SIDEBAR PATCH START ===
+
+-- Convert Topbar into a left sidebar
+Topbar.Size = UDim2.new(0, 180, 1, 0)
+Topbar.Position = UDim2.new(0, 0, 0, 0)
+Topbar.BackgroundColor3 = SelectedTheme.Topbar
+Topbar.BorderSizePixel = 0
+
+-- Vertical layout
+local SidebarList = Instance.new("UIListLayout")
+SidebarList.Parent = Topbar
+SidebarList.SortOrder = Enum.SortOrder.LayoutOrder
+SidebarList.Padding = UDim.new(0, 6)
+SidebarList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Title at top
+Topbar.Title.LayoutOrder = 1
+Topbar.Title.TextXAlignment = Enum.TextXAlignment.Left
+Topbar.Title.Position = UDim2.new(0, 12, 0, 24)
+
+-- Icon (if exists)
+if Topbar:FindFirstChild("Icon") then
+    Topbar.Icon.LayoutOrder = 0
+    Topbar.Icon.Position = UDim2.new(0, 12, 0, 24)
+end
+
+-- Move TabList into sidebar
+TabList.Parent = Topbar
+TabList.LayoutOrder = 10
+TabList.BackgroundTransparency = 1
+TabList.Size = UDim2.new(1, -20, 0, 0)
+TabList.AutomaticSize = Enum.AutomaticSize.Y
+
+-- Make tab buttons full width
+for _, TabButton in ipairs(TabList:GetChildren()) do
+    if TabButton.ClassName == "Frame" and TabButton.Name ~= "Placeholder" then
+        TabButton.Size = UDim2.new(1, 0, 0, 36)
+        if TabButton:FindFirstChild("Title") then
+            TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
+            TabButton.Title.Position = UDim2.new(0, 10, 0.5, 0)
+        end
+    end
+end
+
+-- Move Search + Settings into sidebar
+if Topbar:FindFirstChild("Search") then
+    Topbar.Search.LayoutOrder = 20
+    Topbar.Search.Size = UDim2.new(1, -20, 0, 32)
+end
+
+if Topbar:FindFirstChild("Settings") then
+    Topbar.Settings.LayoutOrder = 21
+    Topbar.Settings.Size = UDim2.new(1, -20, 0, 32)
+end
+
+-- Shift main content to the right
+Elements.Position = UDim2.new(0, 180, 0, 0)
+Elements.Size = UDim2.new(1, -180, 1, 0)
+
+-- === SIDEBAR PATCH END ===
 
 	Main.Size = UDim2.new(0, 420, 0, 100)
 	Main.Visible = true
